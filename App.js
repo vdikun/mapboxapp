@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Mapbox from '@mapbox/react-native-mapbox-gl';
+import TorontoData from './TorontoData.js';
 
 Mapbox.setAccessToken('pk.eyJ1IjoidmRpa291biIsImEiOiJjamF5ams2bTgwZXk3MnFxcWFnMXVxMGl5In0.ZdESaIlfduaPM0CNqdr5Ug');
 
