@@ -12,6 +12,8 @@ export default class App extends Component<{}> {
         this.state = {
             zoomLevel: 10
         };
+
+        this.data = TorontoData;
     }
 
     zoomIn() {
@@ -20,7 +22,7 @@ export default class App extends Component<{}> {
             nextZoomLevel = 15;
         }
         this.setState({ zoomLevel: nextZoomLevel });
-        //this.map.zoomTo(nextZoomLevel, 400);
+        this.componentDidMount();
     }
 
     zoomOut() {
@@ -29,7 +31,7 @@ export default class App extends Component<{}> {
             nextZoomLevel = 1;
         }
         this.setState({ zoomLevel: nextZoomLevel });
-        //this.map.zoomTo(nextZoomLevel, 400);
+        this.componentDidMount();
     }
 
     renderAnnotations(data) {
@@ -41,28 +43,55 @@ export default class App extends Component<{}> {
                         id={i.toString()}
                         coordinate={[marker.longitude, marker.latitude]}>
                         <View style={styles.annotationContainer}>
-                            <View style={styles.annotationFill} />
+                        <View style={styles.annotationFill} />
                         </View>
                         <Mapbox.Callout title={marker.storeName} />
                     </Mapbox.PointAnnotation>
+
                 ))}
             </View>
         )
     }
 
+    componentDidMount() {
+        let bounds = this.getBounds(this.data);
+        this.map.fitBounds(bounds[0], bounds[1], [10,10,10,10]);
+    }
+
+    getBounds(data) {
+        let minLat = data[0].latitude;
+        let maxLat = data[0].latitude;
+        let minLong = data[0].longitude;
+        let maxLong = data[0].longitude;
+        for (var i=1; i<data.length; i++) {
+            let p = data[i];
+            if (p.latitude < minLat) {
+                minLat = p.latitude;
+            }
+            if (p.latitude > maxLat) {
+                maxLat = p.latitude;
+            }
+            if (p.longitude < minLong) {
+                minLong = p.longitude;
+            }
+            if (p.longitude > minLong) {
+                maxLong = p.longitude;
+            }
+        }
+        return [
+            [ maxLong, maxLat ],
+            [ minLong, minLat ]
+        ];
+    }
+
     render() {
-        //const data = TorontoData.slice(0,4);
-        const data = TorontoData.slice(0,160);
-        const center = data[0];
         return (
             <View style={styles.container}>
                 <Mapbox.MapView
                     ref={(ref) => this.map = ref}
-                    zoomLevel={this.state.zoomLevel}
-                    centerCoordinate={[center.longitude, center.latitude]}
                     style={styles.container}
                     showUserLocation={true}>
-                    {this.renderAnnotations(data)}
+                    {this.renderAnnotations(this.data)}
                 </Mapbox.MapView>
                 <View style={ styles.zoomContainer }>
                     <TouchableOpacity style={styles.zoomButton}
